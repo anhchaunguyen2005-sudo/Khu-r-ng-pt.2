@@ -1,0 +1,141 @@
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--ink:#3a2c1c;--card:#fffdf4;--red:#e05252;--gold:#f5b301;--leaf-dark:#3f7a1e;}
+body{font-family:"Segoe UI",-apple-system,Roboto,Arial,sans-serif;background:linear-gradient(#8fd3ff,#cdeec0);min-height:100vh;color:var(--ink);overflow-x:hidden;}
+.hidden{display:none!important;}
+
+/* ---------- HUD ---------- */
+#hud{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,253,244,.92);border-bottom:3px solid var(--leaf-dark);box-shadow:0 3px 10px rgba(0,0,0,.12);}
+.hud-left{display:flex;align-items:center;gap:12px;}
+#hearts{display:flex;gap:3px;flex-wrap:wrap;}
+#hearts span{font-size:20px;transition:all .3s;}
+#hearts span.off{filter:grayscale(1);opacity:.3;transform:scale(.85);}
+#hearts span.pop{animation:heartPop .5s;}
+@keyframes heartPop{40%{transform:scale(1.6) rotate(-14deg);}100%{transform:scale(.85);}}
+#flames{font-weight:800;color:#e25822;font-size:15px;background:#fff0e0;border:2px solid #e25822;border-radius:999px;padding:3px 12px;}
+#stageLabel{font-weight:800;color:var(--leaf-dark);font-size:16px;}
+#biteStamp{font-size:15px;font-weight:700;color:var(--red);background:#ffe9e9;padding:4px 12px;border-radius:999px;border:2px solid var(--red);}
+#biteStamp.bitten{animation:stamp .45s;}
+@keyframes stamp{40%{transform:scale(1.5) rotate(8deg);}}
+
+/* ---------- Màn hình ---------- */
+.screen{display:none;min-height:calc(100vh - 60px);}
+.screen.active{display:flex;align-items:center;justify-content:center;padding:20px;}
+#screen-title,#screen-win,#screen-lose{background:url("assets/bg_title.jpg") center/cover;}
+#screen-win .title-card,#screen-lose .title-card,#screen-title .title-card{background:rgba(255,253,244,.94);backdrop-filter:blur(3px);}
+
+.title-card{position:relative;background:var(--card);border:4px solid var(--leaf-dark);border-radius:24px;max-width:560px;width:100%;padding:36px 30px;text-align:center;box-shadow:0 12px 0 rgba(63,122,30,.35);display:flex;flex-direction:column;gap:14px;align-items:center;}
+.title-card h1{font-size:34px;line-height:1.15;color:var(--red);text-shadow:2px 3px 0 #ffd9a0;}
+.title-card p{font-size:15.5px;line-height:1.55;color:#5a4a33;}
+.title-hero{width:110px;filter:drop-shadow(0 6px 6px rgba(0,0,0,.3));}
+.title-snake{position:absolute;top:-40px;right:-20px;width:150px;transform:rotate(6deg);}
+.title-snake img{width:100%;border:3px solid var(--leaf-dark);border-radius:14px;box-shadow:0 8px 14px rgba(0,0,0,.3);animation:tauntWiggle 2s ease-in-out infinite;}
+.bubble{position:absolute;top:-34px;left:50%;transform:translateX(-50%);background:#fff;border:2.5px solid var(--leaf-dark);border-radius:14px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--ink);white-space:nowrap;box-shadow:0 4px 8px rgba(0,0,0,.2);}
+.bubble::after{content:"";position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--leaf-dark);}
+.btn-big{font:inherit;font-weight:800;font-size:18px;color:#fff;background:linear-gradient(#ffb53a,#f59300);border:none;border-radius:999px;padding:14px 34px;cursor:pointer;box-shadow:0 6px 0 #c96f00;transition:transform .1s;}
+.btn-big:hover{transform:translateY(-2px);}
+.btn-big:active{transform:translateY(3px);box-shadow:0 2px 0 #c96f00;}
+.note{font-size:12.5px;color:#9b8b6f;}
+.note code{background:#f2ecd9;padding:1px 6px;border-radius:5px;}
+#runTeam{display:flex;gap:4px;align-items:flex-end;}
+.run-img{height:88px;}
+#screen-win.active .run-img{animation:run .7s ease-in-out infinite;}
+#screen-win.active .run-img:nth-child(2){animation-delay:.12s;}
+#screen-win.active .run-img:nth-child(3){animation-delay:.24s;}
+#screen-win.active .run-img:nth-child(4){animation-delay:.36s;}
+@keyframes run{50%{transform:translateY(-14px) rotate(-3deg);}}
+
+/* ---------- Bản đồ ---------- */
+#screen-map.active{align-items:flex-start;}
+#mapWrap{position:relative;width:min(480px,94vw);height:min(680px,78vh);margin:0 auto;}
+#mapPath{position:absolute;inset:0;width:100%;height:100%;}
+#mapPath path{fill:none;stroke:#e9d8ae;stroke-width:5;stroke-linecap:round;stroke-dasharray:2 6;}
+#mapNodes .node{position:absolute;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:#fff;border:3px solid var(--leaf-dark);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--leaf-dark);font-size:15px;box-shadow:0 3px 0 rgba(63,122,30,.4);}
+#mapNodes .node.done{background:#cdeec0;}
+#mapNodes .node.current{background:var(--gold);border-color:#c96f00;color:#7a4b00;animation:pulse 1s infinite;}
+@keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.18);}}
+#mapNodes .node.icon{border:none;background:transparent;box-shadow:none;width:60px;height:60px;font-size:40px;}
+#mapHeroWrap{position:absolute;transform:translate(-50%,-88%);transition:left .9s cubic-bezier(.5,1.4,.5,1),top .9s;z-index:5;}
+#mapHeroWrap #mapHero{height:84px;filter:drop-shadow(0 6px 5px rgba(0,0,0,.3));transition:height .5s;}
+#aura,#auraStage{position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,150,40,.55),rgba(255,80,0,.25) 55%,transparent 72%);animation:auraFlicker .8s ease-in-out infinite;}
+@keyframes auraFlicker{50%{opacity:.65;transform:scale(1.06);}}
+
+/* ---------- Cảnh chặng ---------- */
+.scene{position:relative;width:min(880px,96vw);height:min(520px,70vh);border:5px solid var(--leaf-dark);border-radius:20px;overflow:hidden;background:url("assets/bg_forest.jpg") center/cover;box-shadow:0 10px 0 rgba(63,122,30,.3);}
+.scene.dark{filter:saturate(.8) brightness(.75);}
+#stageHero{position:absolute;left:6%;bottom:6%;height:170px;z-index:4;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35));transition:height .6s;}
+#stageHero.walk{animation:walkBob .45s ease-in-out infinite;}
+@keyframes walkBob{50%{transform:translateY(-10px) rotate(-3deg);}}
+#stageHero.lunge{animation:lunge .5s ease-in;}
+@keyframes lunge{30%{transform:translate(180px,-14px) rotate(6deg) scale(1.08);}70%{transform:translate(150px,0) rotate(-2deg);}}
+#stageHero.suffer{animation:suffer .6s ease-in-out;}
+@keyframes suffer{20%{transform:rotate(-10deg) translateY(4px);}40%{transform:rotate(9deg);}60%{transform:rotate(-7deg) translateY(6px);}80%{transform:rotate(5deg);}}
+#auraStage{left:2%;bottom:2%;width:230px;height:230px;z-index:3;}
+
+.snake-card{position:absolute;right:6%;bottom:7%;width:230px;z-index:4;border:3.5px solid var(--leaf-dark);border-radius:16px;overflow:visible;box-shadow:0 10px 16px rgba(0,0,0,.35);transform-style:preserve-3d;transition:transform .2s;}
+.snake-card img{width:100%;display:block;border-radius:12px;}
+.snake-card.show{animation:cardIn .6s cubic-bezier(.3,1.6,.5,1) both, tauntWiggle 1.8s .6s ease-in-out infinite;}
+@keyframes cardIn{from{transform:translateX(280px) rotate(10deg);opacity:0;}}
+@keyframes tauntWiggle{25%{transform:rotate(-3deg) translateY(-4px);}75%{transform:rotate(3deg) translateY(2px);}}
+.snake-card.defeated{animation:none;transform:rotate(6deg) translateY(16px);opacity:.9;filter:grayscale(.4);}
+.snake-card.poof{animation:poof .5s ease-in both;}
+@keyframes poof{40%{transform:scale(1.15) rotate(6deg);opacity:1;}100%{transform:scale(0) rotate(360deg);opacity:0;}}
+#biteOverlay{position:absolute;left:2%;bottom:4%;width:250px;z-index:8;border:3.5px solid #c62828;border-radius:16px;overflow:hidden;box-shadow:0 10px 20px rgba(0,0,0,.5);animation:biteIn .35s cubic-bezier(.3,1.5,.5,1);}
+#biteOverlay img{width:100%;display:block;}
+@keyframes biteIn{from{transform:scale(.3) rotate(-12deg);opacity:0;}}
+.scene.shake{animation:shake .5s;}
+@keyframes shake{20%{transform:translate(-9px,3px);}40%{transform:translate(8px,-4px);}60%{transform:translate(-6px,2px);}80%{transform:translate(5px,-2px);}}
+
+/* ---------- Popup câu hỏi ---------- */
+#quizModal{position:fixed;inset:0;background:rgba(30,45,15,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;}
+.quiz-card{background:var(--card);border:4px solid var(--leaf-dark);border-radius:18px;max-width:520px;width:100%;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 0 rgba(0,0,0,.25);animation:quizIn .35s cubic-bezier(.3,1.5,.5,1);}
+@keyframes quizIn{from{transform:scale(.7);opacity:0;}}
+.quiz-head{display:flex;justify-content:space-between;font-weight:800;color:var(--red);font-size:14px;}
+#quizQ{font-size:17px;font-weight:600;line-height:1.45;}
+#quizOpts{display:flex;flex-direction:column;gap:8px;}
+.qopt{font:inherit;font-size:15px;text-align:left;padding:11px 14px;border-radius:12px;cursor:pointer;background:#fff;border:2.5px solid #d9c99a;display:flex;gap:10px;align-items:center;transition:all .12s;}
+.qopt:hover{border-color:var(--leaf-dark);background:#f4ffe9;}
+.qopt .k{font-weight:800;color:#b39b5e;}
+.qopt.correct{background:#e4f9d8;border-color:#4caf50;}
+.qopt.correct .k{color:#2e7d32;}
+.qopt.wrong{background:#ffe3e3;border-color:#e05252;}
+.qopt.wrong .k{color:#b03030;}
+.qopt:disabled{cursor:default;opacity:.85;}
+#quizFb .fb-ok{color:#2e7d32;font-weight:700;}
+#quizFb .fb-bad{color:#c62828;font-weight:700;}
+.btn-continue{font:inherit;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(#8bc34a,#5a9216);border:none;border-radius:999px;padding:11px 26px;cursor:pointer;box-shadow:0 4px 0 #41700f;margin-top:10px;}
+.btn-continue:active{transform:translateY(2px);box-shadow:0 1px 0 #41700f;}
+
+/* ---------- Boss ---------- */
+#bossGiant{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);width:min(300px,50%);z-index:2;filter:drop-shadow(0 8px 8px rgba(0,0,0,.4));}
+#bossGiant.rage{animation:rage .8s ease-in-out infinite;}
+@keyframes rage{25%{transform:translateX(calc(-50% - 8px)) rotate(-2deg);}75%{transform:translateX(calc(-50% + 8px)) rotate(2deg);}}
+#friends{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);display:flex;gap:clamp(6px,3vw,28px);z-index:4;}
+.friendWrap{position:relative;width:clamp(76px,17vw,110px);}
+.friendWrap img{width:100%;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35));}
+.friendWrap.freed img{animation:joy .6s ease-in-out infinite;}
+@keyframes joy{50%{transform:translateY(-10px);}}
+.rope{position:absolute;inset:-4% -8%;width:116%;height:108%;cursor:pointer;z-index:5;}
+.rope line{stroke:#a1887f;stroke-width:7;stroke-linecap:round;}
+.rope.cut{pointer-events:none;}
+.rope.cut line{animation:ropeCut .4s ease-in both;}
+@keyframes ropeCut{to{opacity:0;transform:translateY(24px);}}
+#sword{position:absolute;right:4%;top:6%;font-size:44px;z-index:6;text-align:center;filter:drop-shadow(0 0 12px gold);}
+#sword span{display:block;font-size:12px;font-weight:800;color:var(--gold);text-shadow:0 1px 2px #000;}
+#bossHint{position:absolute;left:50%;top:4%;transform:translateX(-50%);z-index:6;text-align:center;background:rgba(255,253,244,.92);border:3px solid var(--leaf-dark);border-radius:14px;padding:8px 18px;font-size:14.5px;max-width:86%;}
+
+/* ---------- Hiệu ứng ---------- */
+#biteFlash{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:0;background:radial-gradient(ellipse at center,transparent 35%,rgba(200,20,20,.55));}
+#biteFlash.on{animation:flash .6s ease-out;}
+@keyframes flash{15%{opacity:1;}100%{opacity:0;}}
+.fx-poof{position:absolute;font-size:40px;animation:fxPoof .7s ease-out both;z-index:9;}
+@keyframes fxPoof{to{transform:translateY(-50px) scale(1.8);opacity:0;}}
+.fx-slash{position:absolute;font-size:36px;animation:fxSlash .5s ease-out both;z-index:9;}
+@keyframes fxSlash{from{transform:rotate(-40deg) scale(.5);opacity:1;}to{transform:rotate(20deg) scale(1.6);opacity:0;}}
+
+@media (max-width:560px){
+  .title-card h1{font-size:26px;}
+  #stageHero{height:120px;}
+  .snake-card{width:160px;}
+  #hearts span{font-size:16px;}
+}
+'''
